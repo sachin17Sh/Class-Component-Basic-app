@@ -2,38 +2,40 @@ import { Fragment, Component } from 'react';
 
 import Users from './Users';
 import classes from './UserFinder.module.css';
-
-const DUMMY_USERS = [
-  { id: 'u1', name: 'Max' },
-  { id: 'u2', name: 'Manuel' },
-  { id: 'u3', name: 'Julie' },
-];
+import UsersContext from './store/users-context';
 
 //class Component
 
 class UserFinder extends Component {
+  static contextType = UsersContext;
+
   constructor() {
     super();
     this.state = {
-      filteredUsers: DUMMY_USERS,
+      filteredUsers: [],
       searchTerm: ''
     }
   }
 
+
+  componentDidMount() {
+    // Once the component is mounted, use context to set filteredUsers
+    const filteredUsers = this.context.users;
+    this.setState({ filteredUsers });
+  }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchTerm !== this.state.searchTerm) {
-      // Only update if filtered users have changed
-      const filteredUsers = DUMMY_USERS.filter((user) => user.name.includes(this.state.searchTerm));
+      const filteredUsers = this.context ? this.context.users.filter((user) => user.name.includes(this.state.searchTerm)) : [];
       if (filteredUsers !== this.state.filteredUsers) {
         this.setState({
-          filteredUsers:  DUMMY_USERS.filter((user) => user.name.includes(this.state.searchTerm))
+          filteredUsers: filteredUsers
         });
       }
     }
   }
 
-  searchChangeHandler(event){
-    this.setState({searchTerm: event.target.value})
+  searchChangeHandler(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   render() {
@@ -47,6 +49,7 @@ class UserFinder extends Component {
     );
   }
 }
+
 
 // functional component
 // const UserFinder = () => {
